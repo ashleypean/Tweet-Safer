@@ -11,7 +11,9 @@ const app = express();
 const PORT = 3000;
 
 /* Initialize Database */
-const client = new Client()
+const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+})
 client.connect((err) => {
     if (err) throw Error(`DATABASE CONNECTION ERROR: ${err}`);
     console.log('Connected to database')
