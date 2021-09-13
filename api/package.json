@@ -1,0 +1,29 @@
+{
+  "name": "tweet-safer-api",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.1",
+    "passport": "^0.4.1",
+    "passport-twitter": "^1.0.4",
+    "pg": "^8.7.1",
+    "typescript": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.9.1",
+    "@types/passport": "^1.0.7",
+    "@types/passport-twitter": "^1.0.37",
+    "@types/pg": "^8.6.1",
+    "dotenv": "^10.0.0",
+    "ts-node": "^10.2.1",
+    "ts-node-dev": "^1.1.8",
+    "tslint": "^6.1.3"
+  },
+  "scripts": {
+    "start": "ts-node-dev index.ts --ignore-watch",
+    "nodemon": "nodemon index.ts"
+  }
+}
