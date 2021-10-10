@@ -39,6 +39,9 @@ module.exports = {
     static: path.join(__dirname, "build"),
     compress: true,
     port: 4000,
+    proxy: {
+      '/': 'http://localhost:3000',
+    }
   },
   plugins: [htmlPlugin]
 };

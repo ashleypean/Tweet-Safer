@@ -1,33 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
+  useHistory,
 } from "react-router-dom";
-import Login from './pages/Login';
 import Menu from './components/Menu';
 import 'antd/dist/antd.css';
 import './App.css';
-import { PageHeader } from 'antd';
+import Modal from './components/Modals/Modal';
+import Auth from './pages/Auth';
+import Home from './pages/Home';
+import Header from './components/Header';
 
 const App: React.FC = () => {
+  const history = useHistory();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <Router>
-      <div className="header">
-        <PageHeader
-          className="site-page-header"
-          title="TweetSafer"
-          subTitle="A Better Way to Tweet"
-          backIcon={true}
-          onBack={() => window.history.back()}
-        />
-      </div>
+      <Modal 
+        isOpen={modalOpen} 
+        modalType={modalType} 
+        setModalOpen={setModalOpen} 
+      />
+      <Header />
+
       <div className="App">
         <Menu />
-
         <div style={{width: '80%'}}>
           <Switch>
-            <Route path="/" component={Login} />
+            {isLoggedIn && (
+              <>
+                <Route path="/" component={Home} />
+                <Route component={Home} />
+              </>
+            )}
+            <Route render={() => 
+            <Auth setIsLoggedIn={setIsLoggedIn} />} />
           </Switch>
         </div>
       </div>

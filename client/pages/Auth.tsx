@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Checkbox, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router';
+import { Form, Input, Button, Checkbox, Typography, notification } from 'antd';
 import { ValidateErrorEntity } from 'rc-field-form/lib/interface';
 
 const styles = {
@@ -29,17 +30,60 @@ const styles = {
   }
 }
 
-const Login = () => {
+const Auth: React.FC <{
+  setIsLoggedIn: (status: boolean) => void;
+}> = 
+({ setIsLoggedIn }) => {
+  const history = useHistory();
   const [rememberUser, setRememberUser] = useState(true);
 
   const onCheck = () => setRememberUser(!rememberUser);
 
-  const onFinish = (values:  ValidateErrorEntity<string>) => {
-    console.log('Success:', values);
+  useEffect(() => {
+    fetch('/api/auth/init', {
+      method: 'GET',
+      mode: 'no-cors',
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+    })
+    .then(res => res.json())
+    .then(async data => {
+      const isAuthenticated = data
+      if(isAuthenticated) {
+        await setIsLoggedIn(true)
+        history.push('/')
+      }
+    })
+  }, [])
+
+  const onFinish = (values: ValidateErrorEntity<string>) => {
+    /** 
+     * @description - values
+     * @property - remember { Boolean }
+     * @property - user { Object: { email: string } }
+     */
+    fetch('/api/auth/verify', {
+      method: 'POST', 
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(values)
+    })
+  
+    notification.success({
+      message: 'Email Sent',
+      description:
+        'Please check your email for a confirmation.',
+    });
   };
 
   const onFinishFailed = (errorInfo: ValidateErrorEntity<ValidateErrorEntity<string>>) => {
-    console.log('Failed:', errorInfo);
+    notification.error({
+      message: 'Error',
+      description:
+        'Error authenticating user. Please refresh the page and try again',
+    });
   };
 
 
@@ -115,4 +159,4 @@ const Login = () => {
   )
 };
 
-export default Login;
+export default Auth;
