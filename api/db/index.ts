@@ -1,13 +1,11 @@
-// const { Client } = require('pg')
+import * as init from './sql/init';
+import client from './client';
 
-// function dbConnection() {
-//   const client = new Client()
-//   client.connect()
-//   client.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
-//     console.log(res.rows[0].message)
-//     console.log('connected to DB') // Hello world!
-//     client.end()
-//   })
-// };
+const connectToDb = () => {
+  client.connect((err: Error) => {
+    if (err) throw err;
+    console.log('Database connected');
+  });
+}
 
-// module.exports = dbConnection ;
+export default connectToDb;
