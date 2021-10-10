@@ -1,43 +1,37 @@
 // tslint:disable: no-console
 import express from 'express';
-import { Client } from 'pg';
-import dotenv from 'dotenv';
-import * as init from './db/sql/init';
-
-
-dotenv.config();
+import connectToDb from './db';
+import appRouters from './routes/index';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const PORT = 3000;
 
+/* Middleware */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Express Session config
+app.set('trust proxy', 1)
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    // secure: true,
+    maxAge: 1000 * 60 * 60 * 24 * 6, // 6 days
+  },
+  store: new (require('connect-pg-simple')(session))({
+    conString: process.env.DATABASE_URL,
+  }),
+}))
+
 /* Initialize Database */
-const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-})
-client.connect((err) => {
-    if (err) throw Error(`DATABASE CONNECTION ERROR: ${err}`);
-    console.log('Connected to database')
-})
+connectToDb();
 
-client.query(
-    init.createUserTable,
-    (err, res) => {
-    if(err) throw Error(`ERROR CREATING USERS TABLE: ${err}`)
-    else console.log(`USERS TABLE CREATED: ${res}`)
-})
-
-
-client.query(
-    init.createAccountTable,
-    (err, res) => {
-    if(err) throw Error(`ERROR CREATING ACCOUNTS TABLE: ${err.toString()}`)
-    else console.log(`ACCOUNTS TABLE CREATED:`, res)
-})
-
-app.use(express.static(__dirname + '/'));
-
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
+/* Router */
+app.use('/api', appRouters)
 
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`))
